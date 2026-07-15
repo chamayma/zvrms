@@ -2,21 +2,29 @@ package com.zvrms.service;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import com.zvrms.dto.voter.VoterResponse;
 import com.zvrms.entity.District;
 import com.zvrms.entity.Shehia;
+import com.zvrms.entity.User;
 import com.zvrms.entity.Voter;
 import com.zvrms.repository.DistrictRepository;
 import com.zvrms.repository.ShehiaRepository;
+import com.zvrms.repository.UserRepository;
 import com.zvrms.repository.VoterRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +33,7 @@ public class ReportService {
     private final VoterRepository voterRepository;
     private final DistrictRepository districtRepository;
     private final ShehiaRepository shehiaRepository;
+    private final UserRepository userRepository;
 
     public byte[] allReport() {
         return buildPdf(voterRepository.findAll(), "ALL VOTERS REPORT");
@@ -212,5 +221,87 @@ public byte[] dateRangeExcel(LocalDateTime start,
     }
 
 }
+
+public List<VoterResponse> getDistrictReport(
+        Authentication authentication,
+        String search,
+        Long shehiaId,
+        String sex,
+        LocalDate dateFrom,
+        LocalDate dateTo) {
+
+    User officer = userRepository.findByUsername(authentication.getName())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    List<Voter> voters = voterRepository.findByDistrict(officer.getDistrict());
+
+    if (search != null && !search.isBlank()) {
+
+        voters = voters.stream()
+                .filter(v -> v.getFullName()
+                        .toLowerCase()
+                        .contains(search.toLowerCase()))
+                .collect(Collectors.toList());
+
+    }
+
+    if (shehiaId != null) {
+
+        voters = voters.stream()
+                .filter(v -> v.getShehia().getId().equals(shehiaId))
+                .collect(Collectors.toList());
+
+    }
+
+    if (sex != null && !sex.isBlank()) {
+
+        voters = voters.stream()
+                .filter(v -> v.getSex().equalsIgnoreCase(sex))
+                .collect(Collectors.toList());
+
+    }
+
+    if (dateFrom != null && dateTo != null) {
+
+        voters = voters.stream()
+                .filter(v ->
+
+                        !v.getCreatedAt().isBefore(dateFrom.atStartOfDay())
+
+                        &&
+
+                        !v.getCreatedAt().isAfter(dateTo.atTime(LocalTime.MAX))
+
+                )
+                .collect(Collectors.toList());
+
+    }
+
+    List<VoterResponse> response = new ArrayList<>();
+
+for (Voter voter : voters) {
+
+    VoterResponse dto = new VoterResponse();
+
+    dto.setId(voter.getId());
+    dto.setFullName(voter.getFullName());
+    dto.setVoterNumber(voter.getVoterNumber());
+    dto.setPhoneNumber(voter.getPhoneNumber());
+    dto.setAddress(voter.getAddress());
+    dto.setSex(voter.getSex());
+    dto.setDateOfBirth(voter.getDateOfBirth());
+
+    dto.setDistrict(voter.getDistrict().getName());
+    dto.setShehia(voter.getShehia().getName());
+
+    dto.setRegisteredBy(voter.getRegisteredBy().getFullName());
+    dto.setCreatedAt(voter.getCreatedAt());
+
+    response.add(dto);
+
+}
+
+return response;
+        }
 
 }

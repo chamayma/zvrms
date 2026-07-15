@@ -1,12 +1,17 @@
 package com.zvrms.controller;
 
+import com.zvrms.dto.voter.VoterResponse;
 import com.zvrms.service.ReportService;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -121,6 +126,29 @@ public ResponseEntity<byte[]> dateExcel(
 
             );
 
+}
+
+@GetMapping("/district")
+@PreAuthorize("hasRole('DISTRICT_OFFICER')")
+public ResponseEntity<List<VoterResponse>> districtReport(
+        Authentication authentication,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) Long shehiaId,
+        @RequestParam(required = false) String sex,
+        @RequestParam(required = false) LocalDate dateFrom,
+        @RequestParam(required = false) LocalDate dateTo) {
+
+    return ResponseEntity.ok(
+
+        reportService.getDistrictReport(
+                authentication,
+                search,
+                shehiaId,
+                sex,
+                dateFrom,
+                dateTo)
+
+    );
 }
 
 
