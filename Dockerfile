@@ -2,17 +2,16 @@
 FROM docker.io/library/eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
 
-# Copy maven files first to cache dependencies
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
+# Install native maven inside the build container
+RUN apk add --no-cache maven
 
-# Fix line endings of mvnw script (crucial for Linux environments like Render)
-RUN tr -d '\r' < mvnw > mvnw_unix && mv mvnw_unix mvnw && chmod +x mvnw
-RUN ./mvnw dependency:go-offline
+# Copy only the maven configuration file first to cache dependencies
+COPY pom.xml ./
+RUN mvn dependency:go-offline
 
-# Copy source code and build the package
+# Copy the rest of your source code and build the package (completely bypassing mvnw)
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -Dmaven.test.skip=true
 
 # --- Stage 2: Run the application ---
 FROM docker.io/library/eclipse-temurin:17-jre-alpine
