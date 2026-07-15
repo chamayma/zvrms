@@ -79,8 +79,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Allow your local frontend origin
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        // Allow your local and production frontend origins
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://chamayma.github.io"));
         
         // Allow common HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
