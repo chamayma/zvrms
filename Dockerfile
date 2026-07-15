@@ -1,5 +1,5 @@
 # --- Stage 1: Build the application ---
-FROM docker.io/library/eclipse-temurin:17-jdk-alpine AS build
+FROM docker.io/library/eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 
 # Install native maven inside the build container
@@ -9,12 +9,12 @@ RUN apk add --no-cache maven
 COPY pom.xml ./
 RUN mvn dependency:go-offline
 
-# Copy the rest of your source code and build the package (completely bypassing mvnw)
+# Copy the rest of your source code and build the package
 COPY src ./src
 RUN mvn clean package -Dmaven.test.skip=true
 
 # --- Stage 2: Run the application ---
-FROM docker.io/library/eclipse-temurin:17-jre-alpine
+FROM docker.io/library/eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Copy only the compiled jar from the build stage
