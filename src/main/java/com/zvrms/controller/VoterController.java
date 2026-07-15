@@ -93,7 +93,7 @@ public ResponseEntity<Page<VoterResponse>> getAll(
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('DIRECTOR','SYSTEM_OFFICER')")
+    @PreAuthorize("hasAnyRole('DISTRICT_OFFICER')")
     public ResponseEntity<String> delete(
             @PathVariable Long id) {
 

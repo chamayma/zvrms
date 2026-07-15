@@ -1,6 +1,7 @@
 package com.zvrms.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,12 +24,15 @@ public class Voter {
     private String fullName;
 
     @Column(nullable = false, unique = true, length = 9)
+    @Pattern(regexp="^\\d{9}$")
+
     private String voterNumber;
 
     @Column(nullable = false)
     private LocalDate dateOfBirth;
 
     @Column(nullable = false)
+    @Pattern(regexp="^\\d{10}$")
     private String phoneNumber;
 
     @Column(nullable = false)

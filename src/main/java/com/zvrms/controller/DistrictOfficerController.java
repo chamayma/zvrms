@@ -40,7 +40,7 @@ public class DistrictOfficerController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('DIRECTOR')")
+    @PreAuthorize("hasRole('SYSTEM_OFFICER')")
     public ResponseEntity<String> delete(
             @PathVariable Long id) {
 
