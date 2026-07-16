@@ -13,4 +13,8 @@ public class SystemOfficerDashboardResponse {
 
     private long totalFemale;
 
+    private long totalDistricts;
+
+    private long totalShehia;
+
 }

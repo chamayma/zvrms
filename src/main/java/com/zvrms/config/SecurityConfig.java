@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .hasAnyRole("DIRECTOR","SYSTEM_OFFICER","DISTRICT_OFFICER")
 
                         .requestMatchers("/api/reports/**")
-                        .hasAnyRole("DIRECTOR","SYSTEM_OFFICER")
+                        .hasAnyRole("DIRECTOR","SYSTEM_OFFICER","DISTRICT_OFFICER")
 
                         .requestMatchers("/api/dashboard/**")
                         .hasAnyRole("DIRECTOR","SYSTEM_OFFICER","DISTRICT_OFFICER")

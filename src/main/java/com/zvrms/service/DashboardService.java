@@ -75,6 +75,12 @@ public class DashboardService {
         response.setTotalFemale(
                 voterRepository.countBySexIgnoreCase("Female"));
 
+        response.setTotalDistricts(
+                districtRepository.count());
+
+        response.setTotalShehia(
+                shehiaRepository.count());
+
         return response;
 
     }

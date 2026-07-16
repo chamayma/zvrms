@@ -3,6 +3,7 @@ package com.zvrms.controller;
 import com.zvrms.dto.voter.VoterResponse;
 import com.zvrms.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +21,35 @@ import org.springframework.security.core.Authentication;
 public class ReportController {
 
     private final ReportService reportService;
+
+    @GetMapping
+    public ResponseEntity<Page<VoterResponse>> getReports(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long districtId,
+            @RequestParam(required = false) Long shehiaId,
+            @RequestParam(required = false) String sex,
+            @RequestParam(required = false) LocalDate dateFrom,
+            @RequestParam(required = false) LocalDate dateTo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(
+            reportService.getReportsPage(search, districtId, shehiaId, sex, dateFrom, dateTo, page, size)
+        );
+    }
+
+    @GetMapping("/pdf")
+    public ResponseEntity<byte[]> exportPdf(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long districtId,
+            @RequestParam(required = false) Long shehiaId,
+            @RequestParam(required = false) String sex,
+            @RequestParam(required = false) LocalDate dateFrom,
+            @RequestParam(required = false) LocalDate dateTo) {
+        return pdf(
+            reportService.filteredPdfReport(search, districtId, shehiaId, sex, dateFrom, dateTo),
+            "Director_Report.pdf"
+        );
+    }
 
     @GetMapping("/all")
     public ResponseEntity<byte[]> all() {
@@ -64,24 +94,26 @@ public class ReportController {
     }
 
     @GetMapping("/excel")
-public ResponseEntity<byte[]> excel() {
+    public ResponseEntity<byte[]> exportExcel(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long districtId,
+            @RequestParam(required = false) Long shehiaId,
+            @RequestParam(required = false) String sex,
+            @RequestParam(required = false) LocalDate dateFrom,
+            @RequestParam(required = false) LocalDate dateTo) {
 
-    return ResponseEntity.ok()
-
-            .header(
-                    HttpHeaders.CONTENT_DISPOSITION,
-                    "attachment; filename=voters.xlsx"
-            )
-
-            .contentType(
-                    MediaType.parseMediaType(
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
-            )
-
-            .body(reportService.excelReport());
-
-}
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=Director_Report.xlsx"
+                )
+                .contentType(
+                        MediaType.parseMediaType(
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
+                )
+                .body(reportService.filteredExcelReport(search, districtId, shehiaId, sex, dateFrom, dateTo));
+    }
 
 @GetMapping("/date/pdf")
 public ResponseEntity<byte[]> datePdf(
@@ -151,5 +183,41 @@ public ResponseEntity<List<VoterResponse>> districtReport(
     );
 }
 
+@GetMapping("/district/pdf")
+@PreAuthorize("hasRole('DISTRICT_OFFICER')")
+public ResponseEntity<byte[]> exportDistrictPdf(
+        Authentication authentication,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) Long shehiaId,
+        @RequestParam(required = false) String sex,
+        @RequestParam(required = false) LocalDate dateFrom,
+        @RequestParam(required = false) LocalDate dateTo) {
+    return pdf(
+        reportService.filteredDistrictPdfReport(authentication, search, shehiaId, sex, dateFrom, dateTo),
+        "District_Report.pdf"
+    );
+}
+
+@GetMapping("/district/excel")
+@PreAuthorize("hasRole('DISTRICT_OFFICER')")
+public ResponseEntity<byte[]> exportDistrictExcel(
+        Authentication authentication,
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) Long shehiaId,
+        @RequestParam(required = false) String sex,
+        @RequestParam(required = false) LocalDate dateFrom,
+        @RequestParam(required = false) LocalDate dateTo) {
+    return ResponseEntity.ok()
+            .header(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=District_Report.xlsx"
+            )
+            .contentType(
+                    MediaType.parseMediaType(
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+            )
+            .body(reportService.filteredDistrictExcelReport(authentication, search, shehiaId, sex, dateFrom, dateTo));
+}
 
 }
