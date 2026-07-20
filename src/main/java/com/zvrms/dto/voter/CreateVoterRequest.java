@@ -35,6 +35,12 @@ public class CreateVoterRequest {
     @NotBlank(message = "Sex is required")
     private String sex;
 
+    @NotBlank(message = "Place of birth is required")
+    private String placeOfBirth;
+
+    @NotNull(message = "Issue date is required")
+    private LocalDate issueDate;
+
     @NotNull(message = "Please select Shehia")
     private Long shehiaId;
 

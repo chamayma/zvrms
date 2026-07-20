@@ -41,6 +41,12 @@ public class Voter {
     @Column(nullable = false)
     private String sex;
 
+    @Column
+    private String placeOfBirth;
+
+    @Column
+    private LocalDate issueDate;
+
     @ManyToOne
     @JoinColumn(name = "district_id", nullable = false)
     private District district;

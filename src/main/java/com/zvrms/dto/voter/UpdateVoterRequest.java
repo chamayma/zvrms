@@ -34,4 +34,10 @@ public class UpdateVoterRequest {
     @NotNull(message = "Please select Shehia")
     private Long shehiaId;
 
+    @NotBlank(message = "Place of birth is required")
+    private String placeOfBirth;
+
+    @NotNull(message = "Issue date is required")
+    private LocalDate issueDate;
+
 }

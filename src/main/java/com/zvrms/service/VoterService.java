@@ -62,6 +62,8 @@ if (voterRepository.existsByPhoneNumber(request.getPhoneNumber())) {
     voter.setPhoneNumber(request.getPhoneNumber());
     voter.setAddress(request.getAddress());
     voter.setSex(request.getSex());
+    voter.setPlaceOfBirth(request.getPlaceOfBirth());
+    voter.setIssueDate(request.getIssueDate());
 
     // District is taken automatically from the logged-in officer
     voter.setDistrict(officer.getDistrict());
@@ -103,6 +105,8 @@ if (voterRepository.existsByPhoneNumber(request.getPhoneNumber())) {
         response.setPhoneNumber(voter.getPhoneNumber());
         response.setAddress(voter.getAddress());
         response.setSex(voter.getSex());
+        response.setPlaceOfBirth(voter.getPlaceOfBirth());
+        response.setIssueDate(voter.getIssueDate());
         response.setDistrict(voter.getDistrict().getName());
         response.setShehia(voter.getShehia().getName());
         response.setRegisteredBy(voter.getRegisteredBy().getFullName());
@@ -178,6 +182,8 @@ public List<VoterResponse> searchBySex(String sex) {
     voter.setAddress(request.getAddress());
     voter.setSex(request.getSex());
     voter.setDateOfBirth(request.getDateOfBirth());
+    voter.setPlaceOfBirth(request.getPlaceOfBirth());
+    voter.setIssueDate(request.getIssueDate());
     voter.setShehia(shehia);
     voter.setUpdatedBy(officer.getUsername());
 

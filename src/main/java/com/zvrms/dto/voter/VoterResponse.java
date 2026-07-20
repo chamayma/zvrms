@@ -22,6 +22,10 @@ public class VoterResponse {
 
     private String sex;
 
+    private String placeOfBirth;
+
+    private LocalDate issueDate;
+
     private String district;
 
     private String shehia;
